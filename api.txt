@@ -1,0 +1,14 @@
+
+https://tagindia.itworkshop.in/api/ ----------------------------------------
+tag-team
+gallery
+
+
+
+
+-----------------------------------------------------------------------------
+https://tag.itworkshop.in/api/sector
+
+https://tag.itworkshop.in/api/assessors-tagindia?ssc_code=CSDCI
+
+When the user selects a sector from the dropdown, fetch the assessors by passing the selected sector's ssc_code as a query parameter to the assessors API.
