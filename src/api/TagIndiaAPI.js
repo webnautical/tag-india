@@ -6,8 +6,8 @@ export const TagIndiaAPI = createApi({
   baseQuery: tagIndiaBaseQuery,
   endpoints: (builder) => ({
 
-    getAllGallery: builder.query({
-      query: () => `gallery`,
+    getGallery: builder.query({
+      query: (page = 1) => `gallery?page=${page}`,
     }),
 
     createUser: builder.mutation({
@@ -22,6 +22,6 @@ export const TagIndiaAPI = createApi({
 });
 
 export const {
-  useGetAllGalleryQuery,
+  useGetGalleryQuery,
   useCreateUserMutation,
 } = TagIndiaAPI;

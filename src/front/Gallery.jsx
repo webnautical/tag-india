@@ -2,19 +2,22 @@
 import { useState, useEffect, useCallback } from "react";
 import { MdClose, MdZoomIn, MdZoomOut, MdFileDownload } from "react-icons/md";
 import zoomIcon from '../assets/img/zoom.png';
-import { useGetAllGalleryQuery } from "../api/TagIndiaAPI";
+import { useGetGalleryQuery } from "../api/TagIndiaAPI";
 import { IMG_BASE_URL } from "../helper/utils";
 
 export const Gallery = () => {
-  const { data, isLoading, isError } = useGetAllGalleryQuery();
+  const [page, setPage] = useState(1);
+  const { data, isLoading, isFetching, isError } = useGetGalleryQuery(page);
   const [lightbox, setLightbox] = useState({ open: false, index: 0 });
   const [zoom, setZoom] = useState(1);
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
-  // image ka full URL banana — Laravel storage se
   const getImageUrl = (filename) => `${IMG_BASE_URL()}/gallery/${filename}`;
 
-  const galleryImages = data?.data || [];
+  // Laravel paginate response
+  const galleryImages = data?.data?.data || [];
+  const currentPage = data?.data?.current_page || 1;
+  const lastPage = data?.data?.last_page || 1;
   const total = galleryImages.length;
   const current = galleryImages[lightbox.index];
 
@@ -59,41 +62,23 @@ export const Gallery = () => {
     a.click();
   };
 
-  // ── LOADER ──────────────────────────────
-  if (isLoading) {
-    return (
-      <section className="bg-white lg:py-12 py-6">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-center lg:mb-8 mb-4">Tag Gallery</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div
-                key={i}
-                className="rounded-2xl overflow-hidden p-2 animate-pulse"
-                style={{ boxShadow: "0px 4px 27px 2px #0000001A" }}
-              >
-                <div
-                  className="rounded-lg bg-gray-200"
-                  style={{ aspectRatio: "4/3" }}
-                />
-                <div className="pt-3 pb-2">
-                  <div className="h-4 bg-gray-200 rounded w-3/4" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  // ── ERROR ────────────────────────────────
   if (isError) {
     return (
       <section className="bg-white lg:py-12 py-6">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="lg:mb-8 mb-4">Tag Gallery</h2>
-          <p className="text-red-500">Gallery load nahi ho saki. Please refresh karein.</p>
+          <p className="text-red-500">Failed to load gallery. Please refresh the page.</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (!galleryImages.length) {
+    return (
+      <section className="bg-white lg:py-12 py-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="lg:mb-8 mb-4">Tag Gallery</h2>
+          <p className="text-gray-400">No images found.</p>
         </div>
       </section>
     );
@@ -117,7 +102,8 @@ export const Gallery = () => {
       <section className="bg-white lg:py-12 py-6 gallery_section">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-center lg:mb-8 mb-4">Tag Gallery</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+          <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 transition-opacity duration-300 ${isFetching ? 'opacity-50' : 'opacity-100'}`}>
             {galleryImages.map((img, i) => (
               <div
                 key={img.id}
@@ -150,7 +136,6 @@ export const Gallery = () => {
                   </div>
                 </div>
 
-                {/* title sirf tab show hoga jab ho */}
                 {img.title && (
                   <div className="pt-3 pb-2">
                     <p className="text-sm font-semibold text-black mb-0">{img.title}</p>
@@ -159,6 +144,44 @@ export const Gallery = () => {
               </div>
             ))}
           </div>
+
+          {/* ── PAGINATION ───────────────────── */}
+          {lastPage > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-10 flex-wrap">
+              <button
+                onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                disabled={currentPage === 1 || isFetching}
+                className="px-4 py-2 rounded-lg text-sm font-medium border transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100"
+              >
+                ← Prev
+              </button>
+
+              {[...Array(lastPage)].map((_, i) => {
+                const pageNum = i + 1;
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setPage(pageNum)}
+                    disabled={isFetching}
+                    className={`w-9 h-9 rounded-lg text-sm font-medium border transition-all disabled:cursor-not-allowed
+                      ${currentPage === pageNum ? 'text-white border-transparent' : 'hover:bg-gray-100'}`}
+                    style={currentPage === pageNum ? { background: "#6A1B9A" } : {}}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+
+              <button
+                onClick={() => setPage((p) => Math.min(p + 1, lastPage))}
+                disabled={currentPage === lastPage || isFetching}
+                className="px-4 py-2 rounded-lg text-sm font-medium border transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100"
+              >
+                Next →
+              </button>
+            </div>
+          )}
+
         </div>
       </section>
 
@@ -236,7 +259,6 @@ export const Gallery = () => {
                 />
               </div>
 
-              {/* title ya description sirf tab show hoga jab API se aaye */}
               {(current.title || current.description) && (
                 <div className="text-center mt-6 px-4">
                   {current.title && (
