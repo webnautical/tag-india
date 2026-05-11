@@ -15,8 +15,6 @@ export const Contact = () => {
 
       <ContactForm />
       <EscalationMatrix />
-
-      {/* contact form section yahan add karo */}
     </>
   );
 };

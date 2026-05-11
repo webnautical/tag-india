@@ -4,69 +4,94 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { MapPin, Mail, Phone, ChevronRight } from 'lucide-react';
 import 'react-phone-input-2/lib/style.css';
-import PhoneInputPkg from 'react-phone-input-2';
-const PhoneInput = PhoneInputPkg.default || PhoneInputPkg;
+import { useGetSettingsQuery, useSubmitQueryMutation } from '../../api/TagIndiaAPI';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const CONTACT_INFO = [
-  {
-    icon: <MapPin size={18} />,
-    label: 'Address',
-    value: 'World Trade Park, A-621, Jawahar Lal Nehru Marg, D-Block, Malviya Nagar, Jaipur, Rajasthan 302018, India',
-  },
-  {
-    icon: <Mail size={18} />,
-    label: 'Email',
-    value: 'ceo@tagindia.co.in',
-    href: 'mailto:ceo@tagindia.co.in',
-  },
-  {
-    icon: <Phone size={18} />,
-    label: 'Phone Number ( Mon-Sat 10:00am - 5:00pm )',
-    value: '+91-8955009371',
-    href: 'tel:+918955009371',
-  },
-];
-
 export default function ContactForm() {
+  const { data: settingsData, isLoading: settingsLoading } = useGetSettingsQuery();
+  const settings = settingsData?.data;
+  const [submitQuery, { isLoading: submitting, isSuccess: submitted, error: submitError }] = useSubmitQueryMutation();
+
   const sectionRef = useRef(null);
   const leftRef = useRef(null);
   const rightRef = useRef(null);
+  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
 
-  const [form, setForm] = useState({
-    name: '', email: '', phone: '', message: '',
-  });
-  const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-
+  // GSAP animations – added safety checks
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from(leftRef.current?.children, {
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
-        },
-        opacity: 0, x: -40, stagger: 0.15, duration: 0.7, ease: 'power3.out',
-      });
-      gsap.from(rightRef.current?.children, {
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
-        },
-        opacity: 0, x: 40, stagger: 0.12, duration: 0.7, ease: 'power3.out',
-      });
+      // Only animate if children exist
+      if (leftRef.current?.children) {
+        gsap.from(leftRef.current.children, {
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 80%',
+            toggleActions: 'play none none none',
+          },
+          opacity: 0,
+          x: -40,
+          stagger: 0.15,
+          duration: 0.7,
+          ease: 'power3.out',
+        });
+      }
+      if (rightRef.current?.children) {
+        gsap.from(rightRef.current.children, {
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: 'top 80%',
+            toggleActions: 'play none none none',
+          },
+          opacity: 0,
+          x: 40,
+          stagger: 0.12,
+          duration: 0.7,
+          ease: 'power3.out',
+        });
+      }
     }, sectionRef);
     return () => ctx.revert();
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
-    setTimeout(() => { setSubmitting(false); setSubmitted(true); }, 1500);
+    try {
+      await submitQuery(form).unwrap();
+      setForm({ name: '', email: '', phone: '', message: '' });
+    } catch (err) {
+      console.error('Submission failed:', err);
+    }
   };
+
+  if (settingsLoading) {
+    return (
+      <section className="bg-white py-16">
+        <div className="max-w-6xl mx-auto text-center text-gray-600">Loading contact info...</div>
+      </section>
+    );
+  }
+
+  const contactInfo = [
+    {
+      icon: <MapPin size={18} />,
+      label: 'Address',
+      value: settings?.contact_address || 'Not provided',
+    },
+    {
+      icon: <Mail size={18} />,
+      label: 'Email',
+      value: settings?.contact_email || 'contact@example.com',
+      href: `mailto:${settings?.contact_email}`,
+    },
+    {
+      icon: <Phone size={18} />,
+      label: 'Phone Number',
+      value: settings?.contact_phone || '+91 0000000000',
+      href: `tel:${settings?.contact_phone?.replace(/\s/g, '')}`,
+    },
+  ];
+  const mapUrl = settings?.map_url || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3559.869!2d75.8236!3d26.8467!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x396db5e5a5a5a5a5%3A0x0!2sWorld+Trade+Park%2C+Jaipur!5e0!3m2!1sen!2sin!4v1234567890';
 
   return (
     <>
@@ -87,12 +112,8 @@ export default function ContactForm() {
           box-shadow: 0 0 0 3px rgba(107,33,168,0.1);
         }
         .contact-input::placeholder { color: #9ca3af; }
-
-        /* ✅ Phone input styles */
         .phone-wrap { width: 100%; }
-
         .phone-wrap .react-tel-input { width: 100%; }
-
         .phone-wrap .react-tel-input .form-control {
           width: 100% !important;
           height: 50px !important;
@@ -198,8 +219,6 @@ export default function ContactForm() {
           font-weight: 500 !important;
           margin-left: auto !important;
         }
-
-        /* Submit */
         .submit-btn {
           transition: background 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
         }
@@ -216,17 +235,14 @@ export default function ContactForm() {
         .map-frame:hover { box-shadow: 0 8px 32px rgba(107,33,168,0.15); }
       `}</style>
 
-      <section ref={sectionRef} className="bg-white lg:py-12 py-6 blacklist_section">
+      <section ref={sectionRef} className="bg-white lg:py-12 py-6">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row gap-16 lg:gap-20">
-
-            {/* ── Left ── */}
+            {/* Left column */}
             <div ref={leftRef} className="w-full lg:w-[48%] space-y-8">
-              <h2 className="text-2xl sm:text-3xl font-bold text-black">
-                TAG Contact Information
-              </h2>
+              <h2 className="text-2xl sm:text-3xl font-bold text-black">TAG Contact Information</h2>
               <div className="space-y-6">
-                {CONTACT_INFO.map((info) => (
+                {contactInfo.map((info) => (
                   <div key={info.label} className="info-row flex items-start gap-4">
                     <div className="info-icon-wrap w-11 h-11 rounded-full bg-purple-100 flex items-center justify-center text-[#6A1B9A] flex-shrink-0 mt-0.5">
                       {info.icon}
@@ -246,11 +262,11 @@ export default function ContactForm() {
               </div>
               <div className="map-frame border border-gray-200">
                 <iframe
-                  title="TAG India Location"
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3559.869!2d75.8236!3d26.8467!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x396db5e5a5a5a5a5%3A0x0!2sWorld+Trade+Park%2C+Jaipur!5e0!3m2!1sen!2sin!4v1234567890"
+                  title="Company Location"
+                  src={mapUrl}
                   width="100%"
                   height="240"
-                  style={{ border: 0, display: 'block' }}
+                  style={{ border: 0 }}
                   allowFullScreen=""
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
@@ -258,14 +274,12 @@ export default function ContactForm() {
               </div>
             </div>
 
-            {/* ── Right ── */}
+            {/* Right column */}
             <div ref={rightRef} className="w-full lg:w-[52%] space-y-6">
               <div>
-                <h2 className="text-2xl sm:text-3xl font-bold text-black">
-                  Ready to get started?
-                </h2>
+                <h2 className="text-2xl sm:text-3xl font-bold text-black">Ready to get started?</h2>
                 <p className="text-sm mt-2 leading-relaxed text-gray-500">
-                  Please use the form below to contact us. We will never spam you, or sell your email to third parties.
+                  Please use the form below to contact us. We will never spam you.
                 </p>
               </div>
 
@@ -277,8 +291,6 @@ export default function ContactForm() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
-
-                  {/* Name */}
                   <input
                     type="text"
                     placeholder="Name *"
@@ -287,8 +299,6 @@ export default function ContactForm() {
                     required
                     className="contact-input"
                   />
-
-                  {/* Email */}
                   <input
                     type="email"
                     placeholder="Business Email *"
@@ -297,23 +307,15 @@ export default function ContactForm() {
                     required
                     className="contact-input"
                   />
-
-                  {/* ✅ Phone with flag + country code */}
                   <div className="phone-wrap">
-                    <PhoneInput
-                      country="in"
+                    <input
+                      name='phone'
                       value={form.phone}
-                      onChange={(phone) => setForm((prev) => ({ ...prev, phone }))}
+                      className="contact-input"
+                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
                       placeholder="Phone Number"
-                      enableSearch
-                      searchPlaceholder="Search country..."
-                      disableSearchIcon
-                      preferredCountries={['in', 'us', 'gb', 'ae', 'sg', 'au']}
-                      inputProps={{ name: 'phone' }}
                     />
                   </div>
-
-                  {/* Message */}
                   <textarea
                     placeholder="Message"
                     rows={6}
@@ -321,8 +323,11 @@ export default function ContactForm() {
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
                     className="contact-input resize-none"
                   />
-
-                  {/* Submit */}
+                  {submitError && (
+                    <p className="text-red-500 text-sm">
+                      {submitError?.data?.message || 'Submission failed. Please try again.'}
+                    </p>
+                  )}
                   <button
                     type="submit"
                     disabled={submitting}
@@ -340,11 +345,9 @@ export default function ContactForm() {
                       <>Submit <ChevronRight size={16} className="sub-chevron" /></>
                     )}
                   </button>
-
                 </form>
               )}
             </div>
-
           </div>
         </div>
       </section>

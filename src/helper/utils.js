@@ -1,3 +1,5 @@
+import { label, string } from "three/tsl"
+
 export const TAG_INDIA_BASE_URL = () => {
     return "https://tagindia.itworkshop.in/api/"
 }
@@ -8,4 +10,8 @@ export const TAP_BASE_URL = () => {
 
 export const IMG_BASE_URL = () => {
     return "https://tagindia.itworkshop.in/public/storage/"
+}
+
+export const IMG_BASE_URL_PUBLIC = () => {
+    return "https://tagindia.itworkshop.in/public/"
 }

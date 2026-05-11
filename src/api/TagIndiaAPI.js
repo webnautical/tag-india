@@ -9,19 +9,52 @@ export const TagIndiaAPI = createApi({
     getGallery: builder.query({
       query: (page = 1) => `gallery?page=${page}`,
     }),
-
-    createUser: builder.mutation({
-      query: (body) => ({
-        url: `api/createUser`,
-        method: 'POST',
-        body,
-      }),
+    getTeam: builder.query({
+      query: (page = 1) => `tag-team?page=${page}`,
+    }),
+    getContentPage: builder.query({
+      query: (slug) => `page-content?slug=${slug}`,
     }),
 
+    getPageMenu: builder.query({
+      query: () => `page-menu`,
+    }),
+    getHomePage: builder.query({
+      query: () => `homepage`,
+    }),
+
+    getEscalationMatrix: builder.query({
+      query: () => `contact`,
+    }),
+    getSettings: builder.query({
+      query: () => `settings`,
+      keepUnusedDataFor: 3600, // 1 hour
+    }),
+    submitQuery: builder.mutation({
+      query: (formData) => ({
+        url: `query-submit`,
+        method: 'POST',
+        body: formData,
+      }),
+    }),
+    getServicesMenu: builder.query({
+      query: () => `services`,
+    }),
+    getServicesContent: builder.query({
+      query: (slug) => `service-content?slug=${slug}`,
+    }),
   }),
 });
 
 export const {
   useGetGalleryQuery,
-  useCreateUserMutation,
+  useGetTeamQuery,
+  useGetContentPageQuery,
+  useGetPageMenuQuery,
+  useGetHomePageQuery,
+  useGetEscalationMatrixQuery,
+  useGetSettingsQuery,
+  useSubmitQueryMutation,
+  useGetServicesMenuQuery,
+  useGetServicesContentQuery
 } = TagIndiaAPI;

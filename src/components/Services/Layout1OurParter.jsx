@@ -1,4 +1,3 @@
-// src/components/Home/OurClients.jsx
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -10,7 +9,7 @@ import { IMG_BASE_URL_PUBLIC } from '../../helper/utils';
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function OurClients({ data = [], title }) {
+export default function Layout1OurParter({ data = [], title }) {
   const sectionRef = useRef(null);
   const headingRef = useRef(null);
   const wrapRef    = useRef(null);
@@ -84,7 +83,7 @@ export default function OurClients({ data = [], title }) {
                   className="client-card border border-gray-200 rounded-2xl px-5 py-5 flex items-center justify-center bg-white h-[90px] block"
                 >
                   <img
-                    src={`${IMG_BASE_URL_PUBLIC()}/client-logos/${client.image}`}
+                    src={`${IMG_BASE_URL_PUBLIC()}/${client.image}`}
                     alt={`Client ${client.id}`}
                     className="max-h-[60px] max-w-full w-auto object-contain"
                   />

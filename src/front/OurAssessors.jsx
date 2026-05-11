@@ -1,77 +1,114 @@
 // src/front/OurAssessors.jsx
-import { useState } from "react";
-import { MdKeyboardArrowDown, MdPerson } from "react-icons/md";
+import { useState, useEffect } from "react";
+import { MdKeyboardArrowDown } from "react-icons/md";
 import BreadcrumbHero from '../components/BreadcrumbHero';
 import blacklistedassessors from '../assets/img/our-assessors.jpg';
 import users from '../assets/img/users.png';
-
-const councilData = {
-  "Construction Skill Development Council Of India": [
-    { id: 1, image: "", name: "Priti Jain ", jobRole: "Assistant Electrician L3", language: "English, Hindi", occupation: "Freelancer", experience: "3 years of experience as Electrical Trainer", qualification: "B.Tech in Electrical Engineering", state: "Rajasthan" },
-    { id: 2, image: "", name: "Priti Jain", jobRole: "Assistant Electrician L3", language: "English, Hindi", occupation: "Freelancer", experience: "3 years of experience as Electrical Trainer", qualification: "B.Tech in Electrical Engineering", state: "Rajasthan" },
-    { id: 3, image: "", name: "Priti Jain ", jobRole: "Assistant Electrician L3", language: "English, Hindi", occupation: "Freelancer", experience: "3 years of experience as Electrical Trainer", qualification: "B.Tech in Electrical Engineering", state: "Rajasthan" },
-    { id: 4, image: "", name: "Priti Jain", jobRole: "Assistant Electrician L3", language: "English, Hindi", occupation: "Freelancer", experience: "3 years of experience as Electrical Trainer", qualification: "B.Tech in Electrical Engineering", state: "Rajasthan" },
-    { id: 5, image: "", name: "Priti Jain ", jobRole: "Assistant Electrician L3", language: "English, Hindi", occupation: "Freelancer", experience: "3 years of experience as Electrical Trainer", qualification: "B.Tech in Electrical Engineering", state: "Rajasthan" },
-  ],
-  "Apparel Made-Ups & Home Furnishing Sector Skill Council": [
-    { id: 1, image: "", name: "Priti Jain ", jobRole: "Assistant Electrician L3", language: "English, Hindi", occupation: "Freelancer", experience: "3 years of experience as Electrical Trainer", qualification: "B.Tech in Electrical Engineering", state: "Rajasthan" },
-    { id: 4, image: "", name: "Priti Jain", jobRole: "Assistant Electrician L3", language: "English, Hindi", occupation: "Freelancer", experience: "3 years of experience as Electrical Trainer", qualification: "B.Tech in Electrical Engineering", state: "Rajasthan" },
-    { id: 5, image: "", name: "Priti Jain ", jobRole: "Assistant Electrician L3", language: "English, Hindi", occupation: "Freelancer", experience: "3 years of experience as Electrical Trainer", qualification: "B.Tech in Electrical Engineering", state: "Rajasthan" },
-  ],
-};
-
-const councils = Object.keys(councilData);
+import { useGetSectorsQuery, useGetAssessorsQuery } from "../api/TapAPI";
 
 export const OurAssessors = () => {
-  const [selected, setSelected] = useState(councils[0]);
+  const { data: sectorsData, isLoading: sectorsLoading, isError: sectorsError } = useGetSectorsQuery();
+  const sectors = sectorsData?.data || [];
+
+  const [selectedSectorCode, setSelectedSectorCode] = useState(null);
   const [dropOpen, setDropOpen] = useState(false);
 
-  const assessors = councilData[selected] || [];
+  useEffect(() => {
+    if (sectors.length > 0 && !selectedSectorCode) {
+      const firstCode = sectors[0].code;
+      console.log("Auto-selecting sector code:", firstCode);
+      setSelectedSectorCode(firstCode);
+    }
+  }, [sectors, selectedSectorCode]);
+
+  const {
+    data: assessorsData,
+    isLoading: assessorsLoading,
+    isError: assessorsError,
+    isFetching,
+    error: assessorsErrorDetail,
+  } = useGetAssessorsQuery(selectedSectorCode, {
+    skip: !selectedSectorCode,
+  });
+
+  // Log the full response every time it changes
+  useEffect(() => {
+    if (assessorsData) {
+      console.log("Assessors API raw response:", assessorsData);
+      console.log("Assessors data structure:", JSON.stringify(assessorsData, null, 2));
+    }
+    if (assessorsError) {
+      console.error("Assessors API error:", assessorsErrorDetail);
+    }
+  }, [assessorsData, assessorsError, assessorsErrorDetail]);
+
+  // Try to extract assessors array from various possible paths
+  let assessors = [];
+  if (assessorsData) {
+    if (Array.isArray(assessorsData)) {
+      assessors = assessorsData;
+    } else if (assessorsData.data && Array.isArray(assessorsData.data)) {
+      assessors = assessorsData.data;
+    } else if (assessorsData.assessors && Array.isArray(assessorsData.assessors)) {
+      assessors = assessorsData.assessors;
+    } else if (assessorsData.items && Array.isArray(assessorsData.items)) {
+      assessors = assessorsData.items;
+    } else {
+      console.warn("Unknown assessors response shape:", assessorsData);
+    }
+  }
+
+  const getSelectedSectorName = () => {
+    const found = sectors.find(s => s.code === selectedSectorCode);
+    return found ? found.name : "Select a Sector";
+  };
+
+  if (sectorsError) {
+    return (
+      <section className="bg-white lg:py-12 py-6">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <h2 className="mb-4">Our Assessors</h2>
+          <p className="text-red-500">Failed to load sectors. Please refresh.</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <>
-      <BreadcrumbHero
-        label="Public Info"
-        title="Our Assessors"
-        bgImage={blacklistedassessors}
-      />
+      <BreadcrumbHero label="Public Info" title="Our Assessors" bgImage={blacklistedassessors} />
 
-      <section
-        className="bg-white lg:py-12 py-6 blacklist_section"
-      >
+      <section className="bg-white lg:py-12 py-6">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-
-          {/* Top Row */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 lg:mb-8 mb-4">
-
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 lg:mb-8 mb-4">
             <h2>Assessors List</h2>
-            {/* Dropdown */}
             <div className="relative">
               <button
                 onClick={() => setDropOpen(!dropOpen)}
                 className="button_dropdowns hover:border-gray-400 transition-colors"
+                disabled={sectorsLoading}
               >
-                <span className="truncate">{selected}</span>
-                <MdKeyboardArrowDown
-                  size={20}
-                  className="flex-shrink-0 text-[#989898]"
-                  style={{ transition: "transform 0.2s", transform: dropOpen ? "rotate(180deg)" : "rotate(0deg)" }}
-                />
+                <span className="truncate">
+                  {sectorsLoading ? "Loading sectors..." : getSelectedSectorName()}
+                </span>
+                <MdKeyboardArrowDown size={20} className="flex-shrink-0 text-[#989898]" />
               </button>
-
-              {dropOpen && (
-                <div className="absolute top-full left-0 right-0 mt-1 button_inner shadow-lg overflow-hidden">
-                  {councils.map((council) => (
+              {dropOpen && !sectorsLoading && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white shadow-lg rounded-md max-h-80 overflow-auto z-10">
+                  {sectors.map((sector) => (
                     <button
-                      key={council}
-                      onClick={() => { setSelected(council); setDropOpen(false); }}
-                      className="w-full hover:bg-purple-50 transition-colors"
+                      key={sector.id}
+                      onClick={() => {
+                        setSelectedSectorCode(sector.code);
+                        setDropOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-purple-50"
                       style={{
-                        background: selected === council ? "#f3e8ff" : "",
-                        color: selected === council ? "#6A1B9A" : "#636363",
+                        background: selectedSectorCode === sector.code ? "#f3e8ff" : "",
+                        color: selectedSectorCode === sector.code ? "#6A1B9A" : "#636363",
                       }}
                     >
-                      {council}
+                      {sector.name}
                     </button>
                   ))}
                 </div>
@@ -79,89 +116,55 @@ export const OurAssessors = () => {
             </div>
           </div>
 
-          {/* ── TABLE ── */}
-          <div className="w-full overflow-x-auto table_alls " style={{ border: "1px solid #e8e8f0" }}>
+          <div className="w-full overflow-x-auto border border-gray-200 rounded">
             <table className="w-full border-collapse">
               <thead>
                 <tr style={{ background: "#ede8f8" }}>
-                  <th className="text-center" style={{ width: "50px" }} >S.NO</th>
-                  <th className="text-center ">Image</th>
+                  <th className="text-center"style={{width: "6%"}}>S.NO</th>
+                  <th className="text-center" style={{width: "10%"}}>Image</th>
                   <th className="text-left">Name</th>
-                  <th className="text-left lg:w-[150px] "  >Job Role</th>
-                  <th className="text-left">Language</th>
-                  <th className="text-left">Occupation</th>
+                  <th className="text-left">Email</th>
+                  <th className="text-left">Contact</th>
+                  <th className="text-left">Aadhar No.</th>
                   <th className="text-left">Experience</th>
                   <th className="text-left">Qualification</th>
                   <th className="text-left">State</th>
                 </tr>
               </thead>
-              {/* Body */}
               <tbody>
-                {assessors.length > 0 ? (
+                {!selectedSectorCode ? (
+                  <tr><td colSpan={9} className="py-12 text-center">Select a sector</td></tr>
+                ) : assessorsLoading || isFetching ? (
+                  <tr><td colSpan={9} className="py-12 text-center">Loading assessors...</td></tr>
+                ) : assessorsError ? (
+                  <tr><td colSpan={9} className="py-12 text-center text-red-500">Error loading assessors</td></tr>
+                ) : assessors.length === 0 ? (
+                  <tr><td colSpan={9} className="py-12 text-center text-gray-500">No assessors found for {getSelectedSectorName()}</td></tr>
+                ) : (
                   assessors.map((assessor, i) => (
-                    <tr
-                      key={assessor.id}
-                      className="hover:bg-[#f1e6f94d] transition-colors"
-                      style={{ borderTop: i === 0 ? "none" : "0px solid #f0f0f0" }}
-                    >
-                      {/* S.NO */}
-                      <td >
-                        {assessor.id}
+                    <tr key={assessor.id || i} className="hover:bg-purple-50">
+                      <td className="px-4 py-3 text-center">{i + 1}</td>
+                      <td className="px-4 py-3 text-center">
+                        <img src={users} className="w-10 h-10 rounded-full mx-auto" alt="" />
                       </td>
-
-                      {/* Image */}
-                      <td className="px-4 py-3 align-middle">
-                        <img src={users} className="w-10 h-10 rounded-full m-auto" alt="" />
-                      </td>
-
-                      {/* Name */}
-                      <td >
-                        {assessor.name}
-                      </td>
-
-                      {/* Job Role */}
-                      <td >
-                        {assessor.jobRole}
-                      </td>
-
-                      {/* Language */}
-                      <td>
-                        {assessor.language}
-                      </td>
-
-                      {/* Occupation */}
-                      <td >
-                        {assessor.occupation}
-                      </td>
-
-                      {/* Experience */}
-                      <td style={{ maxWidth: "180px" }}>
-                        {assessor.experience}
-                      </td>
-
-                      {/* Qualification */}
-                      <td style={{ maxWidth: "180px" }}>
-                        {assessor.qualification}
-                      </td>
-
-                      {/* State */}
-                      <td >
-                        {assessor.state}
-                      </td>
+                      <td className="text-left">{assessor.name || assessor.FirstName || "—"}</td>
+                      <td className="text-left">{assessor.email || assessor.Email || assessor.Email || "—"}</td>
+                      <td className="text-left">{assessor.contact || assessor.Contact || "—"}</td>
+                      <td className="text-left">{assessor.aadhar || assessor.Aadhar || "—"}</td>
+    <td className="px-4 py-3">
+      {(() => {
+        const exp = assessor.experience || assessor.Experience;
+        return exp && exp !== "—" ? `${exp} yr` : "—";
+      })()}
+    </td>
+                      <td className="text-left">{assessor.qualification || assessor.Qualification || "—"}</td>
+                      <td className="text-left">{assessor?.state?.name || "—"}</td>
                     </tr>
                   ))
-                ) : (
-                  <tr>
-                    <td colSpan={9} className="py-12 text-center text-gray-400 text-sm">
-                      No assessors available for this council.
-                    </td>
-                  </tr>
                 )}
               </tbody>
-
             </table>
           </div>
-
         </div>
       </section>
     </>

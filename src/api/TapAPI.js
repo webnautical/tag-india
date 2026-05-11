@@ -11,9 +11,21 @@ export const TapAPI = createApi({
       query: () => `api/getProducts`,
     }),
 
+
+    getSectors: builder.query({
+      query: () => `sector`,       // GET /api/sector
+    }),
+
+    // 👇 Add the Assessors endpoint which expects `ssc_code`
+    getAssessors: builder.query({
+      query: (ssc_code) => `assessors-tagindia?ssc_code=${ssc_code}`,
+    }),
+
   }),
 });
 
 export const {
   useGetProductsQuery,
+  useGetSectorsQuery,     
+  useGetAssessorsQuery,
 } = TapAPI;
