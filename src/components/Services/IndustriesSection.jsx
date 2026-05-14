@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { IMG_BASE_URL_PUBLIC } from "../../helper/utils";
+import HTMLContent from "../HTMLContent";
 
 export default function IndustriesSection({ data }) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -7,8 +8,8 @@ export default function IndustriesSection({ data }) {
   if (!data?.items?.length) return null;
 
   const activeItem = data.items[activeIndex];
-  const displayImage = activeItem?.image
-    ? `${IMG_BASE_URL_PUBLIC()}${activeItem.image}`
+  const displayImage = activeItem?.we_serve_image
+    ? `${IMG_BASE_URL_PUBLIC()}${activeItem.we_serve_image}`
     : null;
 
   return (
@@ -47,10 +48,10 @@ export default function IndustriesSection({ data }) {
                       : "0 1px 4px rgba(0,0,0,0.06)",
                   }}
                 >
-                  {ind?.logo && (
+                  {ind?.we_serve_icon && (
                     <img
-                      src={`${IMG_BASE_URL_PUBLIC()}${ind.logo}`}
-                      alt={ind?.name ?? ''}
+                      src={`${IMG_BASE_URL_PUBLIC()}${ind.we_serve_icon}`}
+                      alt={ind?.we_serve_title ?? ''}
                       className="w-7 h-7 object-contain"
                       style={{ filter: isActive ? "none" : "grayscale(40%)" }}
                     />
@@ -59,7 +60,7 @@ export default function IndustriesSection({ data }) {
                     className="text-xs font-medium text-center leading-tight"
                     style={{ color: isActive ? "#7c3abf" : "#555" }}
                   >
-                    {ind?.name}
+                    {ind?.we_serve_title}
                   </span>
                 </button>
               );
@@ -77,7 +78,7 @@ export default function IndustriesSection({ data }) {
                 style={{ aspectRatio: "4/3", animation: "fadeIn 0.35s ease" }}
               >
                 <img
-                  src={displayImage}
+                 src={displayImage}
                   alt={activeItem?.name ?? ''}
                   className="w-full h-full object-cover"
                 />
@@ -98,14 +99,14 @@ export default function IndustriesSection({ data }) {
               className="flex flex-col justify-center"
               style={{ animation: "fadeIn 0.35s ease" }}
             >
-              {activeItem?.name && (
+              {activeItem?.we_serve_title && (
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                  {activeItem.name}
+                  {activeItem.we_serve_title}
                 </h3>
               )}
-              {activeItem?.description && (
+              {activeItem?.we_serve_description && (
                 <p className="text-gray-500 text-sm leading-relaxed">
-                  {activeItem.description}
+                  <HTMLContent data={activeItem.we_serve_description}/>
                 </p>
               )}
             </div>

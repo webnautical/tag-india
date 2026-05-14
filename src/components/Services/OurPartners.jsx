@@ -1,32 +1,17 @@
 // src/components/OurPartners.jsx
-// Step 1 — top pe import karo
-// Step 2 — partnerData mein logo add karo
-const partnerData = {
-  "Sector Skill Councils": [
-    { name: "Partner 1", logo: null },
-    { name: "Partner 2", logo: null },
-    { name: "ESSCI",     logo: null },
-    { name: "FICSI",     logo: null },
-    { name: "Partner 5", logo: null },
-    { name: "Partner 6", logo: null },
-  ],
-  "State Skill Missions": [
-    { name: "ASDM",      logo: null },
-    { name: "Partner 2", logo: null },
-    { name: "Partner 3", logo: null },
-    { name: "Partner 4", logo: null },
-  ],
-  "Schemes": [
-    { name: "PMKUVA",  logo: null },
-    { name: "PMKVY",   logo: null },
-    { name: "ESDM",    logo: null },
-    { name: "DDU-GKY", logo: null },
-  ],
-};
 
-const pTabs = Object.keys(partnerData);
+import { IMG_BASE_URL_PUBLIC } from "../../helper/utils";
 
-const OurPartners = () => {
+const OurPartners = ({ data = [] }) => {
+  const partnerData = data.reduce((acc, partner) => {
+    const type = partner.our_partner_type;
+    if (!acc[type]) acc[type] = [];
+    acc[type].push(partner);
+    return acc;
+  }, {});
+  const pTabs = Object.keys(partnerData);
+  if (!pTabs.length) return null;
+
   return (
     <section className="bg-white py-14 border-t border-gray-100">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -44,14 +29,30 @@ const OurPartners = () => {
               </div>
               <div className="grid grid-cols-3 gap-3">
                 {partnerData[tab].map((p, i) => (
-                  <div key={i} className="flex items-center justify-center p-2 rounded-xl bg-white"
-                    style={{ border: "1px solid #e8e8f0", minHeight: 72 }}>
-                    {p.logo ? (
-                      <img src={p.logo} alt={p.name} className="max-h-10 max-w-full object-contain" />
-                    ) : (
-                      <span className="text-xs font-semibold text-gray-400 text-center leading-tight px-1">{p.name}</span>
-                    )}
-                  </div>
+                  <a
+                    key={i}
+                    href={p.our_partner_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center p-2 rounded-xl bg-white hover:shadow-md transition-shadow duration-200"
+                    style={{ border: "1px solid #e8e8f0", minHeight: 72 }}
+                  >
+                    <img
+                      src={IMG_BASE_URL_PUBLIC()+p.our_partner_logo}
+                      alt={`${tab} partner`}
+                      className="max-h-10 max-w-full object-contain"
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                        e.target.nextSibling.style.display = "block";
+                      }}
+                    />
+                    <span
+                      className="text-xs font-semibold text-gray-400 text-center leading-tight px-1"
+                      style={{ display: "none" }}
+                    >
+                      {tab} Partner
+                    </span>
+                  </a>
                 ))}
               </div>
             </div>

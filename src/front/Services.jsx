@@ -2,6 +2,7 @@ import React from 'react'
 import { useParams } from 'react-router-dom';
 import { useGetServicesContentQuery } from '../api/TagIndiaAPI';
 import { CorporateAssessment } from './CorporateAssessment';
+import { ImpactAssessment } from './ImpactAssessment';
 
 const Services = () => {
     const { slug } = useParams()
@@ -23,13 +24,19 @@ const Services = () => {
             </div>
         );
     }
+
+    console.log("serviceData", serviceData)
+
     return (
         <>
             {
                 leyout === "layout1" ?
-                    <CorporateAssessment data={serviceData?.form_data}/>
+                    <CorporateAssessment data={serviceData?.form_data} />
                     :
-                    <></>
+                    leyout === "layout2" ?
+                        <ImpactAssessment data={serviceData?.form_data} />
+                        :
+                        <></>
             }
         </>
     )

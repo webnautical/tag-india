@@ -264,9 +264,12 @@ export const Gallery = () => {
                   {current.title && (
                     <h3 className="text-white font-bold text-base mb-2">{current.title}</h3>
                   )}
-                  {current.description && (
-                    <p className="text-white text-sm leading-relaxed max-w-lg">{current.description}</p>
-                  )}
+{current.description && (
+  <div 
+    className="text-white text-sm leading-relaxed max-w-lg"
+    dangerouslySetInnerHTML={{ __html: current.description }}
+  />
+)}
                 </div>
               )}
             </div>

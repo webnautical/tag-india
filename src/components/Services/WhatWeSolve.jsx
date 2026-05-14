@@ -1,4 +1,5 @@
 import { IMG_BASE_URL_PUBLIC } from "../../helper/utils";
+import HTMLContent from "../HTMLContent";
 
 function stripHtml(html = '') {
   return html?.replace(/<[^>]*>/g, '').trim() ?? '';
@@ -46,9 +47,9 @@ export default function WhatWeSolve({ data }) {
                     className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center"
                     style={{ background: `${color}18` }}
                   >
-                    {item?.logo ? (
+                    {item?.what_we_solve_icon ? (
                       <img
-                        src={`${IMG_BASE_URL_PUBLIC()}${item.logo}`}
+                        src={`${IMG_BASE_URL_PUBLIC()}${item.what_we_solve_icon}`}
                         alt=""
                         className="w-6 h-6 object-contain"
                       />
@@ -64,7 +65,7 @@ export default function WhatWeSolve({ data }) {
 
                   {/* Text */}
                   <p className="text-gray-700 text-sm font-medium leading-snug">
-                    {stripHtml(item?.description)}
+                    <HTMLContent data={item?.what_we_solve_description}/>
                   </p>
                 </div>
               );

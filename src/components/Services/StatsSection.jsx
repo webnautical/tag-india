@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import HTMLContent from "../HTMLContent";
 
 function stripHtml(html = '') {
   return html?.replace(/<[^>]*>/g, '').trim() ?? '';
@@ -43,7 +44,7 @@ function useCounter(target, duration = 2000, started = false) {
 }
 
 function StatCard({ stat, index, total, started }) {
-  const { value, suffix } = parseCount(stat?.count);
+  const { value, suffix } = parseCount(stat?.impact_count);
   const count = useCounter(value, 2000 + index * 150, started);
   const isLast = index === total - 1;
 
@@ -56,9 +57,9 @@ function StatCard({ stat, index, total, started }) {
         {formatNumber(count)}{suffix}
       </div>
       <div className="font-semibold text-black mb-2">
-        {stat?.title}
+        {stat?.impact_title}
       </div>
-      <p>{stripHtml(stat?.description)}</p>
+      <HTMLContent data={stat?.impact_description}/>
     </div>
   );
 }

@@ -53,7 +53,7 @@ function App() {
           <Route path='/apply-assessor' element={<FrontLayout cmp={ApplyAssessor} />} />
           
           <Route path='/about-us' element={<FrontLayout cmp={AboutUs} />} />
-          <Route path='/sample-papers' element={<FrontLayout cmp={SamplePapers} />} />
+          <Route path='/sample-paper' element={<FrontLayout cmp={SamplePapers} />} />
           <Route path='/downloads' element={<FrontLayout cmp={Downloads} />} />
           <Route path='/faq' element={<FrontLayout cmp={Faq} />} />
           <Route path='/blacklisted-assessors' element={<FrontLayout cmp={BlacklistedAssessors} />} />

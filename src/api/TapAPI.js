@@ -6,12 +6,6 @@ export const TapAPI = createApi({
   baseQuery: tapBaseQuery,
   endpoints: (builder) => ({
 
-    // GET example
-    getProducts: builder.query({
-      query: () => `api/getProducts`,
-    }),
-
-
     getSectors: builder.query({
       query: () => `sector`,       // GET /api/sector
     }),

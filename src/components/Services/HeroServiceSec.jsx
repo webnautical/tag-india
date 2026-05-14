@@ -35,25 +35,21 @@ export default function HeroServiceSec({ data }) {
         )}
 
         <div className="flex flex-wrap items-center justify-center gap-5 mb-10">
-          {data?.button1Text && (
-            <a href={data?.button1Link ?? '#'} className="btn-primary">
-              <MdWifiCalling3 size={18} />
-              {data.button1Text}
-            </a>
-          )}
-          {data?.button2Text && (
-            <a href={data?.button2Link ?? '#'} className="btn-primary-outline">
-              <IoIosMail size={18} />
-              {data.button2Text}
-            </a>
-          )}
+          {
+            data?.buttons?.map((item, i) => (
+              <a href={item?.header_button_link ?? '#'} className="btn-primary" key={i}>
+                {/* <MdWifiCalling3 size={18} /> */}
+                {item.header_button_name}
+              </a>
+            ))
+          }
+          {/* <IoIosMail size={18} /> */}
         </div>
 
         {data?.image && (
           <div
-            className={`transition-all duration-[800ms] ${
-              loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            }`}
+            className={`transition-all duration-[800ms] ${loaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              }`}
           >
             <img
               src={`${IMG_BASE_URL_PUBLIC()}${data.image}`}

@@ -1,8 +1,5 @@
 import { IMG_BASE_URL_PUBLIC } from "../../helper/utils";
-
-function stripHtml(html = '') {
-  return html?.replace(/<[^>]*>/g, '').trim() ?? '';
-}
+import HTMLContent from "../HTMLContent";
 
 export default function OurProcess({ data }) {
   if (!data?.items?.length) return null;
@@ -28,10 +25,10 @@ export default function OurProcess({ data }) {
                 className="w-20 h-20 rounded-full flex items-center justify-center mb-5"
                 style={{ background: "#ebebf8" }}
               >
-                {step?.logo ? (
+                {step?.our_process_icon ? (
                   <img
-                    src={`${IMG_BASE_URL_PUBLIC()}${step.logo}`}
-                    alt={step?.title ?? ''}
+                    src={`${IMG_BASE_URL_PUBLIC()}${step.our_process_icon}`}
+                    alt={step?.our_process_title ?? ''}
                     className="w-10 h-10 object-contain"
                   />
                 ) : (
@@ -45,16 +42,16 @@ export default function OurProcess({ data }) {
               </div>
 
               {/* Title */}
-              {step?.title && (
+              {step?.our_process_title && (
                 <h3 className="font-bold text-gray-900 text-base mb-2">
-                  {step.title}
+                  {step.our_process_title}
                 </h3>
               )}
 
               {/* Description */}
-              {step?.description && (
+              {step?.our_process_description && (
                 <p className="text-gray-500 text-sm leading-relaxed max-w-[200px]">
-                  {stripHtml(step.description)}
+                  <HTMLContent data={step?.our_process_description}/>
                 </p>
               )}
 

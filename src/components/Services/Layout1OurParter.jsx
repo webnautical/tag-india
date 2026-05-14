@@ -12,7 +12,7 @@ gsap.registerPlugin(ScrollTrigger);
 export default function Layout1OurParter({ data = [], title }) {
   const sectionRef = useRef(null);
   const headingRef = useRef(null);
-  const wrapRef    = useRef(null);
+  const wrapRef = useRef(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -67,8 +67,8 @@ export default function Layout1OurParter({ data = [], title }) {
             spaceBetween={24}
             slidesPerView={2}
             breakpoints={{
-              480:  { slidesPerView: 3 },
-              768:  { slidesPerView: 4 },
+              480: { slidesPerView: 3 },
+              768: { slidesPerView: 4 },
               1024: { slidesPerView: 5 },
               1280: { slidesPerView: 6 },
             }}
@@ -77,13 +77,13 @@ export default function Layout1OurParter({ data = [], title }) {
             {looped.map((client, i) => (
               <SwiperSlide key={`${client.id}-${i}`}>
                 <a
-                  href={client.link ?? '#'}
+                  href={client.our_partner_link ?? '#'}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="client-card border border-gray-200 rounded-2xl px-5 py-5 flex items-center justify-center bg-white h-[90px] block"
                 >
                   <img
-                    src={`${IMG_BASE_URL_PUBLIC()}/${client.image}`}
+                    src={`${IMG_BASE_URL_PUBLIC()}/${client.our_partner_logo}`}
                     alt={`Client ${client.id}`}
                     className="max-h-[60px] max-w-full w-auto object-contain"
                   />

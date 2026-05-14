@@ -16,7 +16,7 @@ function FAQItem({ faq, index, isOpen, onToggle }) {
         onClick={() => onToggle(index)}
       >
         <span className="text-gray-800 font-medium text-sm sm:text-base pr-4">
-          {faq?.title}
+          {faq?.faq_title}
         </span>
         <span
           className="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-full transition-all duration-300"
@@ -38,7 +38,7 @@ function FAQItem({ faq, index, isOpen, onToggle }) {
         }}
       >
         <p className="px-6 pb-5 text-gray-500 text-sm leading-relaxed">
-          {stripHtml(faq?.description)}
+          {stripHtml(faq?.faq_description)}
         </p>
       </div>
     </div>
@@ -60,7 +60,7 @@ export default function FAQSection({ data }) {
         <div className="flex flex-col lg:flex-row gap-12 items-start">
 
           {/* Left */}
-          <div className="lg:w-[340px] flex-shrink-0 pt-2">
+          <div className="lg:w-[460px] flex-shrink-0 pt-2">
 
             {/* Icon */}
             <div className="mb-5">

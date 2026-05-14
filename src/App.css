@@ -185,3 +185,5 @@
     border-right-color: var(--border);
   }
 }
+
+.user_deatils p{ color: white;}

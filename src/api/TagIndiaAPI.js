@@ -35,6 +35,7 @@ export const TagIndiaAPI = createApi({
         url: `query-submit`,
         method: 'POST',
         body: formData,
+        formData: true,
       }),
     }),
     getServicesMenu: builder.query({
@@ -43,7 +44,40 @@ export const TagIndiaAPI = createApi({
     getServicesContent: builder.query({
       query: (slug) => `service-content?slug=${slug}`,
     }),
+
+    getJobs: builder.query({
+      query: (type) => `jobs?type=${type}`,
+    }),
+
+    // APPLY JOB
+    submitJob: builder.mutation({
+      query: (formData) => ({
+        url: `query-submit`,
+        method: 'POST',
+        body: formData,
+        formData: true,  // ✅ THIS — tells RTK to skip JSON serialization
+      }),
+    }),
+
+
+    getFaq: builder.query({
+      query: () => `faqs`,
+    }),
+
+    getSamplePaper: builder.query({
+      query: () => "sample_paper",
+    }),
+
+    getDownloads: builder.query({
+      query: () => "downloads",
+    }),
+
+    getAboutUs: builder.query({
+      query: () => "about-us",
+    }),
+
   }),
+
 });
 
 export const {
@@ -56,5 +90,11 @@ export const {
   useGetSettingsQuery,
   useSubmitQueryMutation,
   useGetServicesMenuQuery,
-  useGetServicesContentQuery
+  useGetServicesContentQuery,
+  useGetJobsQuery,
+  useSubmitJobMutation,
+  useGetFaqQuery,
+  useGetSamplePaperQuery,
+  useGetDownloadsQuery,
+  useGetAboutUsQuery
 } = TagIndiaAPI;

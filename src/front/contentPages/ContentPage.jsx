@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useGetContentPageQuery } from "../../api/TagIndiaAPI";
 import { IMG_BASE_URL } from "../../helper/utils";
@@ -6,7 +7,30 @@ const ContentPage = () => {
   const slug = location.pathname.replace(/^\//, "");
   const { data, isLoading, isError } = useGetContentPageQuery(slug);
   const page = data?.data;
- 
+
+  useEffect(() => {
+    if (!page) return;
+
+    document.title = page.meta_title || "Tag India";
+
+    const updateMetaTag = (name, content) => {
+      let meta = document.querySelector(`meta[name="${name}"]`);
+
+      if (!meta) {
+        meta = document.createElement("meta");
+        meta.setAttribute("name", name);
+        document.head.appendChild(meta);
+      }
+
+      meta.setAttribute("content", content || "");
+    };
+
+    updateMetaTag("description", page.meta_description);
+    updateMetaTag("keywords", page.meta_keywords);
+
+  }, [page]);
+
+  console.log('data', data)
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -14,7 +38,7 @@ const ContentPage = () => {
       </div>
     );
   }
- 
+
   if (isError || !page) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -22,25 +46,25 @@ const ContentPage = () => {
       </div>
     );
   }
- 
+
   const sections = [
     { title: page.title1, desc: page.desc1, image: page.image1 },
     { title: page.title2, desc: page.desc2, image: page.image2 },
     { title: page.title3, desc: page.desc3, image: page.image3 },
   ].filter((s) => s.title || s.desc || s.image);
- 
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-8">
       <h1 className="text-3xl sm:text-4xl font-bold text-black capitalize">
         {slug.replace(/-/g, " ")}
       </h1>
- 
+
       {sections.map((section, i) => {
         const hasTitle = !!section.title;
         const hasDesc = !!section.desc;
         const hasImage = !!section.image;
         const isEven = i % 2 === 0;
- 
+
         // Text only
         if (!hasImage) {
           return (
@@ -54,7 +78,7 @@ const ContentPage = () => {
             </div>
           );
         }
- 
+
         // Image only
         if (!hasTitle && !hasDesc) {
           return (
@@ -67,14 +91,13 @@ const ContentPage = () => {
             </div>
           );
         }
- 
+
         // Text + Image — alternating layout
         return (
           <div
             key={i}
-            className={`flex flex-col lg:flex-row items-center gap-12 lg:gap-20 ${
-              !isEven ? "lg:flex-row-reverse" : ""
-            }`}
+            className={`flex flex-col lg:flex-row items-center gap-12 lg:gap-20 ${!isEven ? "lg:flex-row-reverse" : ""
+              }`}
           >
             {/* Image */}
             <div className="w-full lg:w-[45%] flex-shrink-0">
@@ -84,7 +107,7 @@ const ContentPage = () => {
                 className="w-full h-[300px] object-cover rounded-xl shadow-md"
               />
             </div>
- 
+
             {/* Text */}
             <div className="w-full lg:w-[55%] space-y-4">
               {hasTitle && (
@@ -102,7 +125,7 @@ const ContentPage = () => {
           </div>
         );
       })}
- 
+
       {/* Global style for HTML content from API */}
       <style>{`
         .prose-ul-custom ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
@@ -113,5 +136,5 @@ const ContentPage = () => {
     </div>
   );
 };
- 
+
 export default ContentPage;

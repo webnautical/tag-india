@@ -9,16 +9,8 @@ import FooterMobileMenu from '../../components/FooterMobileMenu';
 import { IMG_BASE_URL } from '../../helper/utils';
 import { useGetPageMenuQuery, useGetServicesMenuQuery, useGetSettingsQuery } from '../../api/TagIndiaAPI';
 import logo from '../../assets/img/logo.png';
+import { USEFUL_LINKS } from '../../helper/utils';
 
-const USEFUL_LINKS = [
-  { label: 'Home', href: '/' },
-  { label: 'About Us', href: '/about-us' },
-  { label: 'Gallery', href: '/gallery' },
-  { label: 'Our Team', href: '/our-team' },
-  { label: 'Our Assessors', href: '/our-assessors' },
-  { label: 'Apply Staff', href: '/apply-staff' },
-  { label: 'Apply Assessors', href: '/apply-assessor' },
-];
 
 export default function Footer() {
   const { data: settingsData, isLoading } = useGetSettingsQuery();

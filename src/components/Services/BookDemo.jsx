@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { MdCheckCircle, MdArrowForward } from "react-icons/md";
 import { useSubmitQueryMutation } from "../../api/TagIndiaAPI";
-
-function parseListItems(html = '') {
-  const matches = html?.match(/<li>(.*?)<\/li>/gs) ?? [];
-  return matches.map(li => li.replace(/<[^>]*>/g, '').trim()).filter(Boolean);
-}
+import HTMLContent from "../HTMLContent";
 
 const INITIAL_FORM = {
   type: "service_query",
@@ -135,8 +131,6 @@ export default function BookDemo({ data }) {
 
   if (!data?.heading) return null;
 
-  const expectItems = parseListItems(data?.description ?? '');
-
   const inputClass = (field) =>
     `w-full border rounded-lg px-3 py-2.5 text-sm outline-none bg-gray-50 transition-colors ${
       errors[field] && touched[field]
@@ -159,16 +153,7 @@ export default function BookDemo({ data }) {
               {data.title}
             </p>
           )}
-          {expectItems.length > 0 && (
-            <ul className="flex flex-col gap-3">
-              {expectItems.map((item, i) => (
-                <li key={i} className="flex items-center gap-3">
-                  <MdCheckCircle size={20} style={{ color: "#6A1B9A", flexShrink: 0 }} />
-                  <span className="text-gray-700 text-sm">{item}</span>
-                </li>
-              ))}
-            </ul>
-          )}
+          <HTMLContent data={data?.description}/>
         </div>
 
         {/* Right — Form */}
